@@ -26,7 +26,7 @@ $pj_array = $pj_results['results']['collection1'];
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Free Stock Photos</title>
+	<title>OpenPeeks - Free Stock Photos for the masses</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="css/app.css">
@@ -39,11 +39,11 @@ $pj_array = $pj_results['results']['collection1'];
 
 	<div class="navbar fixed">
 		<div class="container">
-			<h4 class="pull-left"><a href="index.php">Free Stock Photos</a></h4>
+			<h4 class="pull-left"><a href="index.php">OpenPeeks</a></h4>
 			<ul class="pull-right">
 				<li><a href="/">Home</a></li>
 				<li><a href="about.php">About</a></li>
-				<li><a href="#">Github</a></li>
+				<li><a href="https://github.com/ThemeAvenue/OpenPeeks">Github</a></li>
 			</ul>
 		</div>
 	</div>
@@ -51,7 +51,7 @@ $pj_array = $pj_results['results']['collection1'];
 	<div class="superheader">
 		<div class="container">
 			<input type="search" placeholder="Enter keywords..." id="input_search">
-			<h3>Latest 20 pics</h3>
+			<h3>Latest 50 pics</h3>
 		</div>
 	</div>
 
