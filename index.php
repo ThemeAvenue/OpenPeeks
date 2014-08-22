@@ -29,9 +29,7 @@ $pj_array = $pj_results['results']['collection1'];
 	<title>Free Stock Photos</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="css/normalize.css">
-	<link rel="stylesheet" href="css/bijou.min.css">
-	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/app.css">
 	<script src="js/vendor/modernizr-2.8.0.min.js"></script>
 </head>
 <body>

@@ -1,0 +1,132 @@
+{
+  "id": "9491bfa7",
+  "cfgVersion": 1,
+  "name": "freePicsAPI",
+  "files": {
+    "897bd378": {
+      "id": "897bd378",
+      "pid": "9491bfa7",
+      "name": "app.less",
+      "input": "css\\app.less",
+      "customOutput": false,
+      "type": "Less",
+      "config": {
+        "autoCompile": true,
+        "compress": false,
+        "sourcemaps": false,
+        "cleancss": false,
+        "strictMath": false,
+        "strictUnits": false,
+        "autoprefixer": true
+      }
+    },
+    "50ef0fa9": {
+      "id": "50ef0fa9",
+      "pid": "9491bfa7",
+      "name": "main.js",
+      "input": "js\\main.js",
+      "customOutput": false,
+      "type": "Js",
+      "config": {
+        "autoCompile": true,
+        "uglify": true,
+        "mangle": true,
+        "sourcemaps": false
+      }
+    },
+    "d6dc2db1": {
+      "id": "d6dc2db1",
+      "pid": "9491bfa7",
+      "name": "plugins.js",
+      "input": "js\\plugins.js",
+      "customOutput": false,
+      "type": "Js",
+      "config": {
+        "autoCompile": true,
+        "uglify": true,
+        "mangle": true,
+        "sourcemaps": false
+      }
+    },
+    "2e8f9ea2": {
+      "id": "2e8f9ea2",
+      "pid": "9491bfa7",
+      "name": "README.md",
+      "input": "README.md",
+      "customOutput": false,
+      "type": "Md",
+      "config": {
+        "autoCompile": false,
+        "sanitize": false,
+        "gfm": true
+      }
+    }
+  },
+  "imports": {},
+  "images": {
+    "401e092c": {
+      "id": "401e092c",
+      "pid": "9491bfa7",
+      "path": "apple-touch-icon-precomposed.png",
+      "size": 1076,
+      "name": "apple-touch-icon-precomposed.png",
+      "type": "Png",
+      "initialSize": 1076,
+      "status": "NOT_OPTIMIZED"
+    },
+    "ecd37c26": {
+      "id": "ecd37c26",
+      "pid": "9491bfa7",
+      "path": "tile-wide.png",
+      "size": 6774,
+      "name": "tile-wide.png",
+      "type": "Png",
+      "initialSize": 6774,
+      "status": "NOT_OPTIMIZED"
+    },
+    "098a8fdd": {
+      "id": "098a8fdd",
+      "pid": "9491bfa7",
+      "path": "tile.png",
+      "size": 13743,
+      "name": "tile.png",
+      "type": "Png",
+      "initialSize": 13743,
+      "status": "NOT_OPTIMIZED"
+    }
+  },
+  "config": {
+    "watch": true,
+    "liveRefresh": true,
+    "liveRefreshDelay": 0,
+    "filterPatterns": "bower_components,_resources,_src,vendor",
+    "useCustomServer": false,
+    "customServerUrl": "",
+    "cssPath": "css/",
+    "jsPath": "js/",
+    "htmlPath": "html/",
+    "minJsPath": "min/",
+    "htmlExtension": ".html",
+    "cssPathType": "REPLACE_TYPE",
+    "htmlPathType": "REPLACE_TYPE",
+    "jsPathType": "REPLACE_TYPE",
+    "minJsPathType": "RELATIVE_FILEDIR",
+    "htmlTypes": "jade, haml, slim, markdown, md",
+    "cssTypes": "less, sass, stylus, scss, styl",
+    "jsTypes": "coffee, coffeescript, coffeescripts, ls, livescript, livescripts",
+    "cssPreprocessorPath": "",
+    "htmlPreprocessorPath": "",
+    "jsPreprocessorPath": "",
+    "minJsPreprocessorPath": "",
+    "autoprefixerBrowsers": "",
+    "ftpHost": "",
+    "ftpPort": "21",
+    "ftpRemotePath": "",
+    "ftpIgnorePreprocessorFiles": true,
+    "ftpType": "FTP",
+    "ftpExcludePatterns": "",
+    "ftpSecure": false,
+    "ftpPassword": "",
+    "ftpUsername": ""
+  }
+}
