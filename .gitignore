@@ -46,3 +46,4 @@ vendor/
 _resources/
 _src/
 *.bak
+cache
