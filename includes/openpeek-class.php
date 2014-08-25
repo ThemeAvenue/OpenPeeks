@@ -6,124 +6,156 @@
  */
 class OpenPeek {
 
-	protected $app_id  = null;
-	protected $api_key = null;
+	/**
+	 * List of sites to get images from.
+	 * 
+	 * @var array
+	 */
+	public $providers = array();
 
-	public function __construct( $app_id = false, $api_key = false ) {
+	/**
+	 * Default list of fields used.
+	 * 
+	 * @var array
+	 */
+	protected $fields = array(
+		'name',
+		'source',
+		'link',
+		'tags'
+	);
 
-		$this->app_id  = $app_id;
-		$this->api_key = $api_key;
-		$this->route   = 'https://www.kimonolabs.com/api/';
-		$this->cache   = __FILE__ . '/cache/photos_list.json';
+	/**
+	 * List of all the images gathered from all sites.
+	 * 
+	 * @var array
+	 */
+	protected $library = array();
 
-		// CHECK CREDENTIALS
-		
-		$this->load_photo_providers();
+	public function __construct( $cache = null, $cache_expiry = 86400 ) {
+
+		/* Load Kimonolabs API */
+		require_once( realpath( dirname( __FILE__) ) . '/openpeek-kimonolabs-class.php' );
+
+		/* Set cache configuration */
+		$this->cache        = is_null( $cache ) ? realpath( dirname( __FILE__) ) . '/cache/library.json' : $cache;
+		$this->cache_expiry = $cache_expiry;
 
 	}
 
-	protected function load_photo_providers() {
+	/**
+	 * Add a new image provider.
+	 * 
+	 * @param string $provider The provider name
+	 * @param array  $args     A list of arguments used in the provider API
+	 */
+	public function add_api( $provider, $args ) {
+		array_push( $this->providers, array( 'provider' => $provider, 'args' => $args ) );
+	}
 
-		$includes = realpath( dirname( __FILE__) );
-		$files    = scandir( $includes );
+	/**
+	 * Provision the library by querying all APIs.
+	 * 
+	 * @return void
+	 */
+	protected function provision() {
 
-		foreach ( $files as $file ) {
+		$includes = realpath( dirname( __FILE__) ) . '/';
 
-			if ( in_array( $file, array( '.', '..' ) ) )
-				continue;
+		foreach ( $this->providers as $provider ) {
 
-			$ext       = pathinfo( $file, PATHINFO_EXTENSION );
-			$filename  = str_replace( ".$ext", '', $file );
-			$breakdown = explode( '-', $filename );
+			$classname = str_replace( array( '-', '_' ), ' ', $provider['provider'] );
+			$classname = ucwords( $classname );
+			$classname = 'OpenPeek_' . str_replace( ' ', '', $classname );
+			$class     = null;
+			$name      = $provider['provider'];
+			$filename  = "openpeek-$name-class.php";
 
-			if ( in_array( 'class', $breakdown ) ) {
+			if ( !file_exists( $includes . $filename ) )
+				return;
 
-				$key = array_search( 'class', $breakdown );
-				unset( $breakdown[$key] );
+			/* Load the class */
+			require_once( $includes . $filename );
 
-			}
+			/* Dynamically instanciate */
+			$class = new $classname( $provider['args'] );
 
-			if ( is_array( $breakdown ) && count( $breakdown ) >= 2 && 'openpeek' == $breakdown[0] ) {
+			/* Get the pics */
+			$results = $class->get_results();
 
-				$key = array_search( 'openpeek', $breakdown );
-				unset( $breakdown[$key] );
-				$breakdown = array_map( 'ucwords', $breakdown );
-
-				/**
-				 * Get class name.
-				 *
-				 * Get the provider class name based on the filename structure
-				 * defined in the OpenPeeks GihHub repo.
-				 *
-				 * @link https://github.com/ThemeAvenue/OpenPeeks
-				 * @var  string Class name
-				 */
-				$classname = implode( '_', $breakdown );
-
-				if( class_exists( $classname ) )
-					new $classname();
-
-			}
+			/* Add them to the library */
+			$this->update_library( $results );
 
 		}
 
 	}
 
 	/**
-	 * Get full URL to query.
-	 *
-	 * Get the full query URL including application ID
-	 * and API key.
-	 *
-	 * @since  0.1.0
-	 * @return string URL to query
+	 * Whitelist a new field.
+	 * 
+	 * @param  string $field Field name
 	 */
-	protected function get_endpoint_url() {
-
-		$args = http_build_query( array( 'apikey' => $this->api_key ) );
-		$base = $this->route . $this->app_id;
-		$url  = "$base?$args";
-
-		return $url;
+	protected function map_field( $field ) {
+		array_push( $this->fields, $field );
 	}
 
-	public function get_results() {
+	/**
+	 * Get fields whitelist.
+	 * 
+	 * @return array List of mapped fields
+	 */
+	protected function get_mapped_fields() {
+		return $this->fields;
+	}
 
-		$url      = $this->get_endpoint_url();
-		$response = file_get_contents( $url );
-		$body     = json_decode( $response, TRUE );
+	protected function update_library( $content ) {
 
-		/* Check if the content was correctly decoded */
-		if ( JSON_ERROR_NONE !== json_last_error() ) {
+		if ( empty( $content ) )
 			return false;
-		}
 
-		return $body;
+		$fields = $this->get_mapped_fields();
 
-	}
+		foreach ( $content as $key => $image ) {
 
-	protected function get_library() {
+			foreach ( $image as $field => $value ) {
 
-		/* Get library from the cache */
-		if( file_exists( $this->cache ) ) {
+				if ( !in_array( $field, $fields ) )
+					unset( $content[$key][$image][$field] );
 
-			$contents = file_get_contents( $this->cache );
-			$contents = json_decode( $contents );
-
-			/* Check if the content was correctly decoded */
-			if ( JSON_ERROR_NONE !== json_last_error() ) {
-				return $contents;
 			}
 
+			array_push( $this->library, $content[$key] );
+
 		}
-
-		/* Otherwise query all APIs */
-
-		// CACHE RESULTS
 
 	}
 
-	protected function cache_library( $contents ) {
+	public function get_library() {
+
+		/* Get library from the cache */
+		if ( file_exists( $this->cache ) && time()-filemtime( $this->cache ) <= $this->cache_expiry ) {
+
+			$contents = file_get_contents( $this->cache );
+			$contents = json_decode( $contents, true );
+
+			/* Check if the content was correctly decoded */
+			if ( is_array( $contents ) ) {
+				return $contents;
+			} else {
+				return false;
+			}
+
+		} else {
+
+			$this->provision();
+			$this->cache_library( $this->library );
+			return $this->library;
+
+		}
+
+	}
+
+	public function cache_library( $contents ) {
 
 		$file     = $this->cache;
 		$contents = json_encode( $contents );
