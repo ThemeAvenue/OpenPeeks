@@ -47,3 +47,4 @@ _resources/
 _src/
 *.bak
 cache
+config.php
