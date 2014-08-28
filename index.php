@@ -1,26 +1,7 @@
 <?php
-////////////////
-// kaboompics //
-////////////////
-$kp_request = "https://www.kimonolabs.com/api/dumrmhu4?apikey=34f710899fb2424aeb213c881ff10109";
-$kp_response = file_get_contents($kp_request);
-$kp_results = json_decode($kp_response, TRUE);
-$kp_count = $kp_results['count'];
-$kp_array = $kp_results['results']['collection1'];
-// print_r($kp_array);
-
-//////////////
-// picjumbo //
-//////////////
-$pj_request = "https://www.kimonolabs.com/api/52f46muq?apikey=34f710899fb2424aeb213c881ff10109";
-$pj_response = file_get_contents($pj_request);
-$pj_results = json_decode($pj_response, TRUE);
-$pj_count = $pj_results['count'];
-$pj_array = $pj_results['results']['collection1'];
-// print_r($pj_array);
-
+require( 'config.php' );
+// require( '/includes/openpeek-class.php' );
 ?>
-
 <!doctype html>
 <html class="no-js" lang="">
 <head>
@@ -48,10 +29,19 @@ $pj_array = $pj_results['results']['collection1'];
 		</div>
 	</div>
 
+	<?php
+	/* Load a random image */
+	$images = $opdb->get_images( 'all' );
+	$count  = count( $images )-1;
+	$rand   = rand( 0, $count );
+	$url    = $images[$rand]['preview_url'];
+	?>
+	<img src="<?php echo $url; ?>">
+
 	<div class="superheader">
 		<div class="container">
 			<input type="search" placeholder="Enter keywords..." id="input_search">
-			<h3>Latest 50 pics</h3>
+			<h3>Latest 20 pics</h3>
 		</div>
 	</div>
 
@@ -65,75 +55,32 @@ $pj_array = $pj_results['results']['collection1'];
 					<th>Tags</th>
 					<th>Download link</th>
 				</tr>
+
+				<?php
+				for ( $i = 0; $i <= 20; ++$i ) {
+
+					$tags = $opdb->get_image_tags( $i );
+
+					foreach ( $tags as $key => $tag ) {
+						$tags[$key] = "<span class='badge'>$tag</span>";
+					} ?>
+
+					<tr>
+						<td><a target="_blank" class="name" href="<?php echo $images[$i]['source']; ?>" rel="<?php echo $images[$i]['preview_url']; ?>"><?php echo $images[$i]['name']; ?></a></td>
+						<td><?php echo implode( ' ', $tags ); ?></td>
+						<td><a class="button-dl button primary small" href="<?php echo $images[$i]['link']; ?>" download>Download</a></td>
+					</tr>
+
+				<?php }
+				?>
+
 			</thead>
 			<tbody>
 				<tr class="noresults">
 					<td colspan="3">No results...</td>
 				</tr>
-				<?php
-				foreach ($kp_array as $value) {
-					$kp_tags = $value['tags'];
-					$kp_tags = str_replace("TAGS:","",$kp_tags);
-					$kp_tag_single = explode('#', $kp_tags); // $kp_tag_single[1]
-					echo '
-					<tr>
-						<td><a target="_blank" class="name" href="'. $value['name']['href'] .'" rel="'. $value['img'] .'">'. $value['name']['text'] .'</a></td>
-						<td>(hidden)';
-						foreach (array_slice($kp_tag_single,1) as $tag) {
-							// echo "<span class='badge'>$tag</span>";
-						}
-						echo '
-						</td>
-						<td><a class="button-dl button primary small" href="'. $value['link'] .'">Download</a></td>
-					</tr>';
-				}
-				?>
 			</tbody>
 		</table>
-
-		<!-- <h3>PicJumbo</h3> -->
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Tags</th>
-					<th>Download link</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="noresults">
-					<td colspan="3">No results...</td>
-				</tr>
-				<?php
-				foreach ($pj_array as $value) {
-					$pj_dl_link = str_replace("-1300x866","",$value['img']);
-					$pj_filename = str_replace("http://picjumbo.com/wp-content/uploads/","",$value['img']);
-					$pj_filename = str_replace("-1300x866","",$pj_filename);
-					// <td><a class="button primary small" href="http://picjumbo.com/download/?d='. $pj_dl_link .'.jpg">Download</a></td>
-					echo '
-					<tr>
-						<td><a target="_blank" class="name" href="'. $value['link'] .'" rel="'. $value['img'] .'">'. $value['name'] .'</a></td>
-						<td>N/A</td>
-						<td><a class="button-dl button primary small" href="'. $pj_dl_link .'" download="'. $pj_filename .'">Download</a></td>
-					</tr>';
-				}
-				?>
-			</tbody>
-		</table>
-
-		<?php
-		// Retrieve tags from each page (picjumbo)
-		// http://simplehtmldom.sourceforge.net/
-		require_once('includes/simple_html_dom.php');
-
-		// Create DOM from URL or file
-		$html = file_get_html('http://picjumbo.com/ready-to-cut-strawberries/');
-
-		// Find all tags 
-		foreach($html->find('div.meta a') as $element) {
-			echo "<span class='badge'>". $element->innerText() ."</span>";
-		}
-		?>
 
 	</div>
 
