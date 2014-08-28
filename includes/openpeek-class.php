@@ -21,6 +21,7 @@ class OpenPeek {
 	protected $fields = array(
 		'name',
 		'source',
+		'preview_url',
 		'link',
 		'tags'
 	);

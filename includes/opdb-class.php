@@ -82,12 +82,13 @@ class OPDB {
 		/**
 		 * Escape all variables
 		 */
-		$name   = $this->opdb->real_escape_string( $name );
-		$site   = $this->opdb->real_escape_string( $site );
-		$source = filter_var( $source, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
-		$link   = filter_var( $link, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$name        = $this->opdb->real_escape_string( $name );
+		$site        = $this->opdb->real_escape_string( $site );
+		$source      = filter_var( $source, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$link        = filter_var( $link, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$preview_url = filter_var( $preview_url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
 
-		if ( is_array( $tags ) ) {
+		if ( isset( $tags ) && is_array( $tags ) ) {
 
 			foreach ( $tags as $key => $tag ) {
 
@@ -118,7 +119,7 @@ class OPDB {
 		} else {
 
 			/* Insert the image */
-			$image_id = $this->insert_image( array( 'hash' => $hash, 'name' => $name, 'source' => $source, 'link' => $link, 'site' => $site ) );
+			$image_id = $this->insert_image( array( 'hash' => $hash, 'name' => $name, 'source' => $source, 'preview_url' => $preview_url, 'link' => $link, 'site' => $site ) );
 
 			/* Insert tags */
 			if ( is_array( $tags ) ) {
@@ -149,10 +150,11 @@ class OPDB {
 		/**
 		 * Sanitize values
 		 */
-		$name   = $this->opdb->real_escape_string( $values['name'] );
-		$site   = $this->opdb->real_escape_string( $values['site'] );
-		$source = filter_var( $values['source'], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
-		$link   = filter_var( $values['link'], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$name        = $this->opdb->real_escape_string( $values['name'] );
+		$site        = $this->opdb->real_escape_string( $values['site'] );
+		$source      = filter_var( $values['source'], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$link        = filter_var( $values['link'], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
+		$preview_url = filter_var( $values['preview_url'], FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED );
 
 		/**
 		 * Add date
@@ -168,7 +170,7 @@ class OPDB {
 
 		extract( $values );
 
-		$request  = "INSERT INTO $this->images (hash, date_added, name, source, link, site) VALUES ('$hash', '$time', '$name', '$source', '$link', '$site')";
+		$request  = "INSERT INTO $this->images ( hash, date_added, name, source, preview_url, link, site ) VALUES ('$hash', '$time', '$name', '$source', '$preview_url', '$link', '$site')";
 		$insert   = $this->opdb->query( $request );
 
 		if ( false === $insert )
@@ -280,7 +282,7 @@ class OPDB {
 
 			if ( 'all' == $params ) {
 
-				$request = "SELECT * FROM $this->images WHERE 1";
+				$request = "SELECT * FROM $this->images WHERE 1 ORDER BY date_added ASC";
 
 			}
 
@@ -292,18 +294,15 @@ class OPDB {
 		$results = $this->opdb->query( $request );
 		$library = array();
 
+		if ( false === $results )
+			return array();
+
 		while ( $row = $results->fetch_assoc() ) {
 
-			$data = array(
-				'name'   => $row['name'],
-				'source' => $row['source'],
-				'link'   => $row['link'],
-			);
-
 			if ( true === $key_hash ) {
-				$library[$row['hash']] = $data;
+				$library[$row['hash']] = $row;
 			} else {
-				$library[] = $data;
+				$library[] = $row;
 			}
 		}
 

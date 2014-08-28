@@ -7,10 +7,11 @@ class OpenPeek_Picjumbo extends OpenPeek_Kimonolabs {
 
 		foreach ( $content as $key => $image ) {
 
-			$current           = array();
-			$current['name']   = $image['name'];
-			$current['source'] = $image['link'];
-			$current['link']   = $image['img'];
+			$current                = array();
+			$current['name']        = $image['name'];
+			$current['source']      = $image['link'];
+			$current['preview_url'] = $image['img'];
+			$current['link']        = str_replace( '-1300x866', '', $image['img'] );
 
 			array_push( $clean, $current );
 
